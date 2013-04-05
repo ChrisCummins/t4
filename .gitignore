@@ -1,0 +1,32 @@
+# transient editor files
+[#]*[#]
+.[#]*
+*~
+
+# http://www.gnu.org/software/automake
+
+Makefile
+Makefile.in
+
+# http://www.gnu.org/software/autoconf
+
+/aclocal.m4
+/autom4te.cache
+/autoscan.log
+/compile
+/config.log
+/config.status
+/configure
+/configure.scan
+/depcomp
+/install-sh
+/missing
+
+# release tarballs
+t4-*.tar.gz
+
+# generated files
+/README
+/t4.m4
+/t4c
+/t4c.sh

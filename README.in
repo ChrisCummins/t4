@@ -1,0 +1,68 @@
+README for t4 @T4_VERSION@
+==============================================================================
+
+DESCRIPTION
+------------------------------------------------------------------------------
+
+t4 is a tool for conveniently generating application tests as shell scripts. t4
+consists of two components, the first an m4 macro library `t4.m4' which defines
+a number of useful macros for writing test scripts. Using this library, a user
+can create concise test scripts using a combination of regular shell syntax and
+the t4.m4 macros. These user-created files are referred to as t4 files. The
+second component, t4c, is a small program which generates executable shell
+scripts from these t4 files. This is analogous to writing configure.ac files and
+then using GNU Autoconf to generate configure scripts.
+
+See the `Documentation' directory for a description of the bundled t4
+macros. Several example t4 files may be found in the `examples' directory.
+
+REQUIREMENTS
+------------------------------------------------------------------------------
+
+t4 has no dependencies beyond those required by the Autotools suite which is
+used to build the package.
+
+BUILDING AND INSTALLATION
+------------------------------------------------------------------------------
+
+Please refer to the INSTALL document.
+
+BUGS
+------------------------------------------------------------------------------
+
+Please report bugs to chrisc.101@gmail.com. The ideal way of reporting a bug is
+to find the minimal steps required to reproduce it, and to write a test to
+demonstrate this. Failing that, please write a descriptive bug report including
+the following:
+
+  • what system you're running on
+  • which version of t4 you are using
+  • how to reproduce the bug
+
+CONTRIBUTING
+-------------------------------------------------------------------------------
+
+Contributions are more than welcome. You can email me patches using
+git-send-email (1), or you can create a remote branch on GitHub and ask me to
+pull from that for more substantial changes. Ideally standalone patches should
+be created using git format-patch since that makes it easiest to import the
+patch with a commit message into a git repository.
+
+LICENSE
+------------------------------------------------------------------------------
+
+Copyright (c) 2013 Christopher E. Cummins <chris.101@gmail.com>.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

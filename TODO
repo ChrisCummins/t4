@@ -1,0 +1,15 @@
+*** 0.0.1 ***
+
+ - Change verbose printout to PREFIX().
+
+ - Add configure.ac t4 macro.
+
+ - Add dir exist checks to dir assumptions.
+
+ - t4c: Quit on m4 fail.
+
+ - m4: Add # comment annotations.
+
+ - Add an XML second pass to add <see>MACRO<see> cross references.
+
+ - render XML tree in web interface.

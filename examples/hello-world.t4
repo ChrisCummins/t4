@@ -1,0 +1,25 @@
+# An example of a simple t4 file. The idea here is to merely demonstrate the
+# most basic t4 usage.
+
+# All t4 tests should begin with with the T4_INIT macro. This servers the
+# purpose of including a lot of set up boiler plate, such as parsing command
+# line options, and initialising a first test fixture. This macro should only be
+# used once per test, and should be the first t4 macro used.
+T4_INIT()
+
+# Run the command `ls' and fail if it does not succeed. This is the bread and
+# butter of any honest testing library, and will be used often.
+OK([ls])
+
+# Run the command `ls /path/to/nothing' and fail if it does succeed. The idea
+# here is to give it a command that you know should fail under normal
+# circumstances, and if it in fact succeeds, then this test fails. This form of
+# assertion is useful for testing known breaking conditions, bad inputs, error
+# cases etc.
+NOK([ls /path/to/nothing])
+
+# This wouldn't be a good example if it didn't print `Hello, World!'. In this
+# case, we're going to print it 10 times, to demonstrate nested macro
+# calls. Here, the output macro T4_PRINT() is nested with the iterating macro
+# LOOP(). Macros can be nested to arbritrary depth.
+LOOP([10], [T4_PRINT([Hello, World!])])

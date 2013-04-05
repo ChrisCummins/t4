@@ -1,0 +1,454 @@
+dnl
+dnl   t4.m4 - macros for t4 scripts
+dnl   =============================
+dnl
+dnl t4 version @T4_VERSION@
+dnl Copyright (C) 2013 Christopher E. Cummins
+dnl Released under MIT license, <http://opensource.org/licenses/MIT>
+dnl Written by Christopher E. Cummins
+
+divert(-1)
+
+dnl
+dnl   Variables and constants.
+dnl   ========================
+dnl
+dnl EXPORT @var T4 version.
+define([T4_VERSION], [@T4_VERSION@])
+dnl EXPORT @var The test file.
+define([T4_FILE], [$t4_file])
+dnl EXPORT @var Return value for skipped test.
+define([T4_EXIT_TEST_SKIPPED], [$t4_exit_test_skipped])
+dnl EXPORT @var Return value for a fatal error.
+define([T4_EXIT_TEST_FATAL], [1])
+
+dnl
+dnl   Output proceedures.
+dnl   ===================
+dnl
+dnl EXPORT Print message to stdout.
+dnl @param msg
+define([T4_PRINT], [dnl
+if ! (( $T4_SILENT )); then
+  echo -e "$1"
+fi])
+
+dnl EXPORT Print warning message to stdout.
+dnl @param msg
+define([T4_WPRINT], [dnl
+if ! (( $T4_SILENT )); then
+  echo -e "T4_FILE():$LINENO (W) $1" >&2
+fi])
+
+dnl EXPORT Print error message to stdout.
+dnl @param msg
+define([T4_EPRINT], [dnl
+if ! (( $T4_SILENT )); then
+  echo -e "T4_FILE():$LINENO (W) $1" >&2
+fi])
+
+dnl EXPORT Print a verbose message.
+dnl
+dnl This message will only be printed with the test is run with the --verbose
+dnl option at run time.
+dnl @param msg
+define([T4_VERBOSE], [dnl
+if (( $[T4_VERBOSE] )) && ! (( $T4_SILENT )); then
+  echo -e "T4_FILE():$LINENO (I) $1";
+fi])
+
+dnl EXPORT Print an error message and quit.
+dnl
+dnl The test will exit with return code defined in T4_EXIT_TEST_FATAL.
+dnl @param msg
+define([T4_FATAL], [dnl
+T4_EPRINT([*** FATAL *** $1])
+exit T4_EXIT_TEST_FATAL()])
+
+dnl
+dnl   Assertions.
+dnl   ===========
+dnl
+dnl EXPORT Execute the given instruction and assert that it succeeds.
+dnl
+dnl By default, this discard stdout (not stderr).
+dnl @param command to execute
+define([OK], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+$1 >/dev/null
+if (( $? )); then
+    T4_FATAL([assert '$1' failed!])
+fi])
+
+dnl EXPORT Execute the given instruction and assert that it fails.
+dnl
+dnl By default, this discards stderr (not stdout).
+dnl @param command to execute
+define([NOK], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+$1 2>/dev/null
+if ! (( $? )); then
+    T4_FATAL([assert fails '$1' failed!])
+fi])
+
+dnl EXPORT Assert that an expression is true, else fail.
+dnl @param expression to evaluate
+define([ASSERT], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+if ! (( $1 )); then
+  T4_FATAL([assertion '$1' failed!])
+fi])
+
+dnl EXPORT Assert that a value is zero, else fail.
+dnl @param value
+define([ASSERT_ZERO], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+if (( $1 )); then
+  T4_FATAL([assertion '$1' = '0' failed!])
+fi])
+
+dnl EXPORT Assert that a value is not zero, else fail.
+dnl @param value
+define([ASSERT_NOT_ZERO], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+if ! (( $1 )); then
+  T4_FATAL([assertion '$1' != '0' failed!])
+fi])
+
+dnl EXPORT Assert that a string is empty, else fail.
+dnl @param string
+define([ASSERT_STRING_EMPTY], [dnl
+T4_VERBOSE([[$0]: '$1' = ''])
+
+test -n '$1' && {
+  T4_FATAL([assertion '$1' = '' failed!])
+}])
+
+dnl EXPORT Assert that a string is not empty, else fail.
+dnl @param string
+define([ASSERT_STRING_NOT_EMPTY], [dnl
+T4_VERBOSE([[$0]: '$1' != ''])
+
+test -z '$1' && {
+  T4_FATAL([assertion '$1' != '' failed!])
+}])
+
+dnl EXPORT Assert that two strings match, else fail.
+dnl @param string operand
+dnl @param string operand
+define([ASSERT_STRINGS_MATCH], [dnl
+T4_VERBOSE([[$0]: '$1' = '$2'])
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_STRING_NOT_EMPTY([$2])
+
+test "$1" != "$2" && {
+  T4_PRINT([  string 1: '$1'])
+  T4_PRINT([  string 2: '$1'])
+  T4_FATAL([strings do not match!])
+}])
+
+dnl EXPORT Assert that the given directory exists, else fail.
+dnl @param directory
+define([ASSERT_IS_DIR], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+test -d "$1" || {
+  T4_FATAL([assertion '$1' is dir failed!])
+}])
+
+dnl EXPORT Assert that the given directory does not exist, else fail.
+dnl @param directory
+define([ASSERT_IS_NOT_DIR], [dnl
+T4_VERBOSE([[$0]: '$1'])
+
+test -d "$1" && {
+  T4_FATAL([assertion '$1' is not dir failed!])
+}])
+
+dnl EXPORT Assert that the given directory is empty, else fail.
+dnl @param directory
+define([ASSERT_DIR_EMPTY], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_IS_DIR([$1])
+
+if (( "$(find "$1" | tail -n +2 | wc -l)" > 0 )); then
+  T4_PRINT([Contents of '$1':])
+  find "$1"
+  T4_FATAL([assertion '$1' is empty failed!])
+fi])
+
+dnl EXPORT Assert that the given directory is not empty, else fail.
+dnl @param directory
+define([ASSERT_DIR_NOT_EMPTY], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_IS_DIR([$1])
+
+if (( "$(find "$1" | wc -l)" < 1 )); then
+  T4_FATAL([assertion '$1' is not empty failed!])
+fi])
+
+dnl EXPORT Assert that the given regular file exists, else fail.
+dnl @param file
+define([ASSERT_IS_FILE], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+test -f "$1" || {
+  T4_FATAL([assertion '$1' is [file] failed!])
+}])
+
+dnl EXPORT Assert that the given regular file does not exist, else fail.
+dnl @param file
+define([ASSERT_IS_NOT_FILE], [dnl
+T4_VERBOSE([[$0]: '$1'])
+
+test ! -f "$1" || {
+  T4_FATAL([assertion '$1' is not [file] failed!])
+}])
+
+dnl EXPORT Assert that the given file is empty, else fail.
+dnl @param file
+define([ASSERT_FILE_EMPTY], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_IS_FILE([$1])
+
+if (( "$(cat "$1" | wc -l)" > 0 )); then
+  T4_PRINT([Contents of '$1':])
+  cat "$1"
+  T4_FATAL([assertion '$1' is empty failed!])
+fi])
+
+dnl EXPORT Assert that the given file is not empty, else fail.
+dnl @param file
+define([ASSERT_FILE_NOT_EMPTY], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_IS_FILE([$1])
+
+if (( "$(cat "$1" | wc -l)" < 1 )); then
+  T4_FATAL([assertion '$1' is not empty failed!])
+fi])
+
+dnl EXPORT Assert that the given file exists, else fail.
+dnl @param file
+define([ASSERT_EXISTS], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+test -e "$1" || {
+  T4_FATAL([assertion '$1' exists failed!])
+}])
+
+dnl EXPORT Assert that the given file does not exist, else fail.
+dnl @param file
+define([ASSERT_DOES_NOT_EXIST], [dnl
+T4_VERBOSE([[$0]: '$1'])
+
+test -e "$1" && {
+  T4_FATAL([assertion '$1' does not exist failed!])
+}])
+
+dnl EXPORT Assert that the given symlink is broken, else fail.
+dnl @param symlink
+define([ASSERT_IS_BROKEN_SYMLINK], [dnl
+T4_VERBOSE([[$0]: '$1'])
+
+test ! -L "$1" && {
+  T4_FATAL([assertion '$1' is broken symlink failed!])
+}])
+
+dnl EXPORT Assert that the given files are identical, else fail.
+dnl @param file
+dnl @param file
+define([ASSERT_FILES_MATCH], [dnl
+T4_VERBOSE([[$0]: '$1' = '$2'])
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_STRING_NOT_EMPTY([$2])
+ASSERT_IS_FILE([$1])
+ASSERT_IS_FILE([$2])
+
+diff "$1" "$2" >/dev/null 2>&1
+if (( $? )); then
+  diff "$1" "$2"
+  T4_FATAL([files '$1' and '$2' do not match!])
+fi])
+
+dnl EXPORT Assert that the given directories are identical, else fail.
+dnl @param directory
+dnl @param directory
+define([ASSERT_DIRS_MATCH], [dnl
+T4_VERBOSE([[$0]: '$1'] = '$2'])
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_STRING_NOT_EMPTY([$2])
+ASSERT_IS_DIR([$1])
+ASSERT_IS_DIR([$2])
+
+diff -d "$1" "$2" >/dev/null 2>&1
+if (( $? )); then
+  diff -d "$1" "$2"
+  T4_FATAL([directories '$1' and '$2' do not match!])
+fi])
+
+dnl
+dnl   Test proceedures.
+dnl   =================
+dnl
+
+define([forloop], [pushdef([$1], [$2])_forloop([$1], [$2], [$3],
+		                               [$4])popdef([$1])])
+define([_forloop], [$4[]ifelse($1, [$3], , [define([$1],
+                                            incr($1))_forloop([$1], [$2],
+					                      [$3], [$4])])])
+
+dnl EXPORT Initialise t4 test script.
+dnl @param The number of iterations to perform.
+dnl @param The action to perform for each iteration.
+define([LOOP], [dnl
+ASSERT_STRING_NOT_EMPTY([$1])
+ASSERT_STRING_NOT_EMPTY([$2])
+dnl [snip]
+forloop([t4_internal_counter], 1, $1, [dnl
+T4_VERBOSE([[$0](t4_internal_counter, $1)])
+$2
+])])
+
+dnl EXPORT Initialise t4 test script.
+define([T4_INIT], [dnl
+## -------------- ##
+## t4 Variables.  ##
+## -------------- ##
+t4_exit_test_skipped=77
+t4_file="$(basename $[]0)"
+t4_test_root=/tmp
+
+## -------------------- ##
+## t4 Shell Functions.  ##
+## -------------------- ##
+t4_print_help() {
+  cat <<EOF
+Usage: 'T4_FILE()' [OPTIONS]
+
+Options:
+  -h, --help                print this help, then exit
+  -V, --version             print t4 version number, then exit
+  -S, --skip                exit with value T4_EXIT_TEST_SKIPPED()
+  -v, --verbose             verbosely report processing
+  -s, --silent              do not report processing
+  -d, --debug               report all executed commands
+
+Report bugs to <chrisc.101@gmail.com>.
+EOF
+}
+
+t4_print_version() {
+  cat <<EOF
+t4 @T4_VERSION@
+Copyright (C) 2013 Christopher E. Cummins
+Released under MIT license, <http://opensource.org/licenses/MIT>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Christopher E. Cummins.
+EOF
+}
+
+t4_teardown() {
+  T4_TEARDOWN()
+}
+trap t4_teardown EXIT
+
+## ------------------- ##
+## t4 Initialisation.  ##
+## ------------------- ##
+for arg in $[]@; do
+    case $arg in
+        "-h" | "--help")
+            t4_print_help
+            exit 0
+            ;;
+        "-V" | "--version")
+            t4_print_version
+            exit 0
+            ;;
+        "-v" | "--verbose")
+            [T4_VERBOSE]=1
+            shift
+            ;;
+        "-d" | "--debug")
+            T4_DEBUG=1
+            shift
+            ;;
+        "-S" | "--skip")
+            exit $T4_EXIT_TEST_SKIPPED
+            ;;
+        "-s" | "--silent")
+            T4_SILENT=1
+            ;;
+    esac
+done
+
+test "$T4_DEBUG" = "1" && { set -x; }
+
+T4_FIXTURE()
+]) dnl /T4_INIT
+
+dnl EXPORT Set up a test fixture, if one doesn]t exist.
+define([T4_FIXTURE], [dnl
+## ---------------- ##
+## Set Up Fixture.  ##
+## ---------------- ##
+test -z "$t4_test_fixture_dir" && {
+  ASSERT_STRING_NOT_EMPTY([$t4_test_root])
+
+  t4_test_fixture="t4-$(date '+%s%N')"
+  t4_test_fixture_dir="$t4_test_root/$t4_test_fixture"
+
+  ASSERT_STRING_NOT_EMPTY([$t4_test_fixture])
+  ASSERT_STRING_NOT_EMPTY([$t4_test_fixture_dir])
+
+  T4_VERBOSE([[$0]: '$t4_test_fixture_dir'])
+
+  OK([mkdir -p "$t4_test_fixture_dir"])
+  pushd "$t4_test_fixture_dir" >/dev/null 2>&1
+}]) dnl /T4_FIXTURE
+
+dnl EXPORT Tear down a test fixture, if one exists.
+define([T4_TEARDOWN], [dnl
+test -n "$t4_test_fixture_dir" && {
+  T4_VERBOSE([[$0]: '$t4_test_root/$t4_test_fixture'])
+  ASSERT_IS_DIR([$t4_test_fixture_dir])
+
+  test "$T4_DEBUG" = "1" && {
+    rm -rvf "$t4_test_fixture_dir"
+  } || {
+    rm -rf "$t4_test_fixture_dir"
+  }
+  ASSERT_IS_NOT_DIR([$t4_test_fixture_dir])
+
+  t4_test_fixture=""
+  t4_test_fixture_dir=""
+}]) dnl /T4_TEARDOWN
+
+dnl EXPORT Include an extra file containing m4 macro definitions.
+dnl @param m4 file
+define([T4_INCLUDE], [dnl
+T4_VERBOSE([[$0]: '$1'])
+ASSERT_STRING_NOT_EMPTY([$1])
+
+include([$1])])
+
+divert(0)dnl
