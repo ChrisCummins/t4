@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="t4 : A tool for generating tests as shell scripts from m4 macros" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>t4</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ChrisCummins/t4">View on GitHub</a>
+
+          <h1 id="project_title">t4</h1>
+          <h2 id="project_tagline">A tool for generating tests as shell scripts from m4 macros</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ChrisCummins/t4/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ChrisCummins/t4/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>Overview</h3>
+
+<p>t4 is a tool for conveniently generating application tests as shell scripts. t4
+consists of two components, the first an m4 macro library `t4.m4' which defines
+a number of useful macros for writing test scripts. Using this library, a user
+can create concise test scripts using a combination of regular shell syntax and
+the t4.m4 macros. These user-created files are referred to as t4 files. The
+second component, t4c, is a small program which generates executable shell
+scripts from these t4 files. This is analogous to writing configure.ac files and
+then using GNU Autoconf to generate configure scripts.</p>
+
+<h3>Example file</h3>
+
+<p>A very basic t4 file <code>hello-world.t4</code>:</p>
+
+<pre><code># An example of a simple t4 file. The idea here is to merely demonstrate the
+# most basic t4 usage.
+
+# All t4 tests should begin with with the T4_INIT macro. This servers the
+# purpose of including a lot of set up boiler plate, such as parsing command
+# line options, and initialising a first test fixture. This macro should only be
+# used once per test, and should be the first t4 macro used.
+T4_INIT()
+
+# Run the command `ls' and fail if it does not succeed. This is the bread and
+# butter of any honest testing library, and will be used often.
+OK([ls])
+
+# Run the command `ls /path/to/nothing' and fail if it does succeed. The idea
+# here is to give it a command that you know should fail under normal
+# circumstances, and if it in fact succeeds, then this test fails. This form of
+# assertion is useful for testing known breaking conditions, bad inputs, error
+# cases etc.
+NOK([ls /path/to/nothing])
+
+# This wouldn't be a good example if it didn't print `Hello, World!'.
+T4_PRINT([Hello, World!])
+</code></pre>
+
+<p>To compile, run and test:</p>
+
+<pre><code>  $ t4c -v -o hello-world.t4
+  t4c: generating 'hello-world.t4c'
+  t4c: processing m4 file 'hello-world.t4c'
+  t4c: removing m4 file 'hello-world.t4c'
+  $ ls -l
+  -rwxrwxr-x 1 chris chris  9745 Apr  5 01:49 hello-world
+  -rw-rw-r-- 1 chris chris  1223 Apr  5 01:18 hello-world.t4
+  $ ./hello-world
+  Hello, World!
+</code></pre>
+
+<h3>License</h3>
+
+<p>Copyright (c) 2013 Christopher E. Cummins <a href="mailto:chris.101@gmail.com">chris.101@gmail.com</a>.</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">t4 maintained by <a href="https://github.com/ChrisCummins">ChrisCummins</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
