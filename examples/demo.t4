@@ -1,0 +1,46 @@
+# Another example t4 file. This time, the idea is to merely demonstrate some of
+# the range of macros available in t4; it is not an example of a real-world
+# testing scenario.
+
+T4_INIT()
+T4_PRINT([t4 version:   T4_VERSION()])
+T4_PRINT([current file: T4_FILE()])
+
+T4_PRINT([Example message.])
+T4_WPRINT([Warning message.])
+T4_EPRINT([Error message.])
+T4_VERBOSE([Verbose message.])
+
+OK([pwd])
+NOK([ls /not/a/real/path])
+
+ASSERT([1])
+ASSERT_ZERO([0])
+ASSERT_NOT_ZERO([1])
+ASSERT_STRING_EMPTY([])
+ASSERT_STRING_NOT_EMPTY([test])
+ASSERT_STRINGS_MATCH([test], [test])
+
+dir=$(date +%s)
+mkdir -p $dir
+ASSERT_IS_DIR([$dir])
+ASSERT_DIR_EMPTY([$dir])
+
+file=$dir/test
+touch $file
+ASSERT_DIR_NOT_EMPTY([$dir])
+ASSERT_EXISTS([$file])
+ASSERT_IS_FILE([$file])
+ASSERT_FILE_EMPTY([$file])
+echo "Hello, world!" > $file
+ASSERT_FILE_NOT_EMPTY([$file])
+rm -f $file
+ASSERT_DOES_NOT_EXIST([$file])
+ASSERT_IS_NOT_FILE([$file])
+rmdir "$dir"
+ASSERT_IS_NOT_DIR([$dir])
+
+echo "Hello, world" > tmp1
+echo "Hello, world" > tmp2
+ASSERT_FILES_MATCH([tmp1], [tmp2])
+rm -f tmp1 tmp2
