@@ -26,7 +26,6 @@ Makefile.in
 t4-*.tar.gz
 
 # generated files
-/README
 /t4.m4
 /t4c
 /t4c.sh
